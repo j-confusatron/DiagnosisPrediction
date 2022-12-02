@@ -1,0 +1,105 @@
+{
+    "DiagnosisCategory": {
+        "DiagnosisCategory2idx": {
+            "Digestive System/ GI": 0,
+            "Skin Disorders": 1,
+            "CNS/ Neuromusc Dis": 2,
+            "Cancer": 3,
+            "Pediatrics": 4,
+            "Cardiac/Circ Problem": 5,
+            "Foot Disorder": 6,
+            "Chron Pain Synd": 7,
+            "Genetic Diseases": 8,
+            "Vision": 9,
+            "Immuno Disorders": 10,
+            "Not Applicable": 11,
+            "Prevention/Good Hlth": 12,
+            "Dental Problems": 13,
+            "Infectious Disease": 14,
+            "GU/ Kidney Disorder": 15,
+            "Morbid Obesity": 16,
+            "Orth/Musculoskeletal": 17,
+            "Respiratory System": 18,
+            "Trauma/ Injuries": 19,
+            "Pregnancy/Childbirth": 20,
+            "Mental Disorder": 21,
+            "Blood Related Disord": 22,
+            "Endocrine/Metabolic": 23,
+            "OB-GYN/ Pregnancy": 24,
+            "Autism Spectrum": 25,
+            "Other": 26,
+            "Post Surgical Comp": 27,
+            "Ears/Nose/Throat": 28
+        },
+        "idx2DiagnosisCategory": [
+            "Digestive System/ GI",
+            "Skin Disorders",
+            "CNS/ Neuromusc Dis",
+            "Cancer",
+            "Pediatrics",
+            "Cardiac/Circ Problem",
+            "Foot Disorder",
+            "Chron Pain Synd",
+            "Genetic Diseases",
+            "Vision",
+            "Immuno Disorders",
+            "Not Applicable",
+            "Prevention/Good Hlth",
+            "Dental Problems",
+            "Infectious Disease",
+            "GU/ Kidney Disorder",
+            "Morbid Obesity",
+            "Orth/Musculoskeletal",
+            "Respiratory System",
+            "Trauma/ Injuries",
+            "Pregnancy/Childbirth",
+            "Mental Disorder",
+            "Blood Related Disord",
+            "Endocrine/Metabolic",
+            "OB-GYN/ Pregnancy",
+            "Autism Spectrum",
+            "Other",
+            "Post Surgical Comp",
+            "Ears/Nose/Throat"
+        ],
+        "DiagnosisCategory_len": 29
+    },
+    "AgeRange": {
+        "AgeRange2idx": {
+            "": 0,
+            "31 to 40": 1,
+            "41 to 50": 2,
+            "51 to 64": 3,
+            "21 to 30": 4,
+            "0 to 10": 5,
+            "65+": 6,
+            "11 to 20": 7
+        },
+        "idx2AgeRange": [
+            "",
+            "31 to 40",
+            "41 to 50",
+            "51 to 64",
+            "21 to 30",
+            "0 to 10",
+            "65+",
+            "11 to 20"
+        ],
+        "AgeRange_len": 8
+    },
+    "PatientGender": {
+        "PatientGender2idx": {
+            "Female": 0,
+            "Other": 1,
+            "Male": 2,
+            "": 3
+        },
+        "idx2PatientGender": [
+            "Female",
+            "Other",
+            "Male",
+            ""
+        ],
+        "PatientGender_len": 4
+    }
+}

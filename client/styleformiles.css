@@ -1,0 +1,33 @@
+body {
+    font-family: Arial, sans-serif;
+  }
+.high {
+    color: darkgreen;
+}
+.med {
+    color:goldenrod
+}
+.low {
+    color: crimson;
+}
+.patientbox {
+    border-radius: 25px;
+    border: 2px solid #B7A57A;
+    padding: 20px;
+    width: 760px;
+    height: 290px;
+}
+.title {
+    font-size: 20;
+    font-weight: bold;
+    color: #4B2E83;
+}
+.section_label {
+    font-size: 16;
+    font-weight: bold;
+    color: #545454;
+}
+.diagnosis {
+    font-size: 20;
+    font-weight: bold;
+}

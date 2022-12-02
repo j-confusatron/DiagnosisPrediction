@@ -1,0 +1,202 @@
+<html>
+    <head>
+        <title>Diagnosis Predictor</title>
+        <link rel="stylesheet" href="styleformiles.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+        <script>
+
+            var umls2label = {
+                "T005": "Virus",
+                "T007": "Bacterium",
+                "T017": "Anatomical Structure",
+                "T022": "Body System",
+                "T031": "Body Substance",
+                "T033": "Finding (lab/test result, sign, symptom)",
+                "T037": "Injury or Poisoning",
+                "T038": "Biological Function",
+                "T058": "Health Care Activity (lab/diagnostic process, therapeutic or preventive procedure)",
+                "T062": "Research Activity",
+                "T074": "Medical Device",
+                "T082": "Spatial Concept (body location, geographic location, molecular sequence)",
+                "T091": "Biomedical Occupation/Discipline",
+                "T092": "Organization",
+                "T097": "Professional or Occupational Group",
+                "T098": "Population Group",
+                "T103": "Chemical",
+                "T168": "Food",
+                "T170": "Intellectual Product",
+                "T201": "Clinical Attribute",
+                "T204": "Eukaryote: Plant/Fungus/Animal"
+            };
+
+            var lbl_chart = null;
+            var attn_chart = null;
+
+            function getClass(score) {
+                if (score > .8) {
+                    cls = "high";
+                } else if (score > .6) {
+                    cls = "med";
+                } else {
+                    cls = "low";
+                }
+                return cls;
+            }
+            function getColor(score, high, med) {
+                if (score > high) {
+                    cls = "darkgreen";
+                } else if (score > med) {
+                    cls = "goldenrod";
+                } else {
+                    cls = "crimson";
+                }
+                return cls;
+            }
+
+            function getDiagnosis() {
+                var notes = $.trim($("#notes").val());
+                var age = $.trim($("#age").val());
+                var gender = $.trim($("#gender").val());
+
+                var post_data = {
+                    type: "POST",
+                    url: "http://localhost:5000/infer",
+                    data: `{
+                        "utterance": "${notes}", "age": "${age}", "gender": "${gender}"
+                    }`,
+                    success: function (result, status, xhr) {
+                        console.log(result)
+
+                        // Diagnosis
+                        $("#diag_main").html("<span title=\""+result.diagnosis.score+"\">"+result.diagnosis.diagnosis+"</span>")
+                        $("#diag_main").removeClass("high med low")
+                        $("#diag_main").addClass(getClass(result.diagnosis.score))
+
+                        // Candidates
+                        x_lbl = []
+                        y_lbl = []
+                        clr_lbl = []
+                        for (const i_entity in result.labels) {
+                            score = result.labels[i_entity].score.toFixed(4)
+                            lbl = result.labels[i_entity].label
+                            x_lbl.push(lbl)
+                            y_lbl.push(score)
+                            clr_lbl.push(getColor(score, 0.8, 0.6))
+                        }
+                        lbl_chart.data = {
+                            labels: x_lbl,
+                            datasets: [{
+                                backgroundColor: clr_lbl,
+                                data: y_lbl
+                            }]
+                        };
+                        lbl_chart.update()
+
+                        // NER
+                        ner_words = "|&nbsp;"
+                        for (const i_entity in result.ner) {
+                            score = result.ner[i_entity].score.toFixed(4)
+                            tag = result.ner[i_entity].tag
+                            lbl = umls2label[tag]
+                            title = tag+": "+lbl+" ("+score+")"
+                            ner_words += `<span class="${getClass(score)}" title="${title}">`
+                            ner_words += result.ner[i_entity].word
+                            ner_words += "</span>&nbsp;|&nbsp;"
+                        }
+                        $("#words").html(ner_words)
+
+                        // Attention
+                        x_attn = []
+                        y_attn = []
+                        clr_attn = []
+                        med = 1 / result.attention.length
+                        high  = 2 * med
+                        for (const i_entity in result.attention) {
+                            score = result.attention[i_entity].attn.toFixed(4)
+                            x_attn.push(result.attention[i_entity].word)
+                            y_attn.push(score)
+                            clr_attn.push(getColor(score, high, med))
+                        }
+                        attn_chart.data = {
+                            labels: x_attn,
+                            datasets: [{
+                                backgroundColor: clr_attn,
+                                data: y_attn
+                            }]
+                        };
+                        attn_chart.update();
+                    },
+                    dataType: "json",
+                    contentType: "application/json"
+                }
+
+                $.ajax(post_data);
+            };
+
+            $(document).ready(function() {
+                $("#btnSubmit").click(getDiagnosis);
+
+                lbl_chart = new Chart("labels", {
+                    type: "bar",
+                    options: {
+                        legend: {display: false},
+                        title: {
+                            display: true,
+                            text: "Candidates"
+                        }
+                    }
+                });
+
+                attn_chart = new Chart("attention", {
+                    type: "bar",
+                    options: {
+                        legend: {display: false},
+                        title: {
+                            display: true,
+                            text: "Word Attention"
+                        }
+                    }
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div class="patientbox">
+            <span class="title">Patient Data</span>
+            <p>
+            <label for="gender">Gender: </label>
+            <select id="gender">
+                <option value="Female">Female</option>
+                <option value="Male">Male</option>
+                <option value="Other">Prefers other label</option>
+                <option value="">Undisclosed</option>
+            </select>
+            &nbsp;&nbsp;
+            <label for="age">Age: </label>
+            <select id="age">
+                <option value="0 to 10">0 to 10</option>
+                <option value="11 to 20">11 to 20</option>
+                <option value="21 to 30">21 to 30</option>
+                <option value="31 to 40">31 to 40</option>
+                <option value="41 to 50">41 to 50</option>
+                <option value="51 to 64">51 to 64</option>
+                <option value="65+">65+</option>
+                <option value="">Undisclosed</option>
+            </select>
+            <p>
+            <label for="notes">Medical Notes:</label>
+            <br>
+            <textarea id="notes" rows="10" cols="100">
+An enrollee has requested authorization and coverage for midwife/nurse practitioner services at an accredited birthing center. Birth centers around the country provide antepartum and peripartum care for people with low-risk pregnancies who desire an out-of-hospital birth experience and who are expected to have an uncomplicated birth. For such people, birth center care can result in greater satisfaction and the same or better outcomes as an in-hospital birth. Through a thorough informed consent process, the patient and her provider are able to make a joint decision on birth expectation and contingency plans in order to deliver a child safely in this manner. People with low-risk pregnancies are candidates for birth center care. Generally, a female with a term singleton pregnancy in vertex presentation, and no medical or obstetric conditions that increase the risk for serious intrapartum or postpartum complications can be defined as low risk by criteria defined by the American College of Obstetricians and Gynecologists (ACOG). In this case, the patient has had an uncomplicated pregnancy. Additionally, there are no medical or obstetric conditions that increase the risk for serious intrapartum or postpartum complications. Therefore, midwife/nurse practitioner services at an accredited birthing center are medically necessary for the patient's pregnancy. Final Result: The reviewer determined that the requested services are medically necessary for evaluation of the patient's medical condition. Therefore, the Health Plan's denial should be overturned.
+            </textarea>
+            <p>
+            <input id="btnSubmit" type="submit" value="Submit"/>
+        </div>
+
+        <p><span class="section_label">Diagnosis:</span>&nbsp<span id="diag_main" class="diagnosis"></span></p>
+        <p><canvas id="labels" style="width:100%;max-width:1400px;height:100%;max-height:250px"></canvas></p>
+        <p><span class="section_label">Word Identification</span><br><div id="words" style="width:100%;max-width:1400px;"></div></p>
+        <p><canvas id="attention" style="width:100%;max-width:1400px;height:100%;max-height:400px"></canvas></p>
+    </body>
+</html>
