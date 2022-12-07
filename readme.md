@@ -36,10 +36,10 @@ You'll need to know your machines name. From a CLI with your virtual environment
 
 Use your machine's name to create a new sub-section in system.ini. It should look like:
 
-`[Dantooine]`
-
-`ner_model_path = d:\medlangmodel\ner\`
-
-`classification_model_path = d:\medlangmodel\classification\`
+```
+[Dantooine]
+ner_model_path = d:\medlangmodel\ner\
+classification_model_path = d:\medlangmodel\classification\
+```
 
 `ner_model_path` and `classification_model_path` are the paths where the trainers will write models and where the server will read models from.
