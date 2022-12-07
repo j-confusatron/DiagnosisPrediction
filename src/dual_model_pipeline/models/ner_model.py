@@ -3,6 +3,7 @@ import torch
 import nltk.data
 from dual_model_pipeline.data.ner_medmentions_load import get_ner_tags
 from sys_config import SysConfig
+import os
 
 nltk.download('punkt')
 
@@ -13,7 +14,7 @@ class NER_Model():
         config = SysConfig()
         self.sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
         self.model_name = config.ner_model_name
-        self.checkpoint = config.ner_checkpoint
+        self.checkpoint = os.path.join(config.ner_model_path, config.ner_checkpoint)
         self.device = device if device else torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
         self.model = AutoModelForTokenClassification.from_pretrained(self.checkpoint)

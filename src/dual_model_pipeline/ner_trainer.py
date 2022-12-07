@@ -8,6 +8,7 @@ import shutil
 from copy import deepcopy
 
 from dual_model_pipeline.data.ner_medmentions_load import NERMedMentionsDataset, get_ner_tags
+from sys_config import SysConfig
 
 
 def product_dict(**kwargs):
@@ -27,7 +28,7 @@ def hyperparam_path(hyperparams):
 def get_hyperparameters():
     return {
         'n_epochs': [3],
-        'lr': [0.0001],
+        'lr': [5e-05],
         'wdecay': [0.01],
         'batch_size': [16],
         'metric_freq': [100]
@@ -64,6 +65,7 @@ def compute_metrics(eval_pred):
 
 def train_model(name, checkpoint):
     # Load data & model.
+    config = SysConfig()
     tags2id, id2tags = get_ner_tags()
     tokenizer = AutoTokenizer.from_pretrained(checkpoint)
     model = AutoModelForTokenClassification.from_pretrained(checkpoint, num_labels=len(tags2id.keys()))
@@ -73,7 +75,7 @@ def train_model(name, checkpoint):
     hyperparameters = list(product_dict(**get_hyperparameters()))
 
     for i, h in enumerate(hyperparameters):
-        m_dir = os.path.join('d:', os.sep, 'medlangmodel', 'ner', name, hyperparam_path(h))
+        m_dir = os.path.join(config.ner_model_path, hyperparam_path(h))
         shutil.rmtree(m_dir, ignore_errors=True)
         os.makedirs(m_dir, exist_ok=True)
         print("\nTraining:")
@@ -92,7 +94,8 @@ def train_model(name, checkpoint):
             logging_steps=h['metric_freq'],
             evaluation_strategy="steps",
             eval_steps=h['metric_freq'],
-            save_steps=600
+            save_steps=600,
+            save_total_limit=1
         )
 
         trainer = Trainer(

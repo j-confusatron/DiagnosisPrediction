@@ -17,6 +17,10 @@ class SysConfig():
         return self.config[self.hostname]['ner_checkpoint']
 
     @property
+    def ner_model_path(self):
+        return self.config[self.hostname]['ner_model_path']
+
+    @property
     def classification_model_name(self):
         return self.config[self.hostname]['classification_model_name']
 
